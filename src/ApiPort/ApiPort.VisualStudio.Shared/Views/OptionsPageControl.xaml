@@ -1,0 +1,211 @@
+﻿<UserControl x:Class="ApiPortVS.Views.OptionsPageControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:const="clr-namespace:ApiPortVS.Resources;assembly=ApiPort.VisualStudio.Common"
+             mc:Ignorable="d"
+             d:DesignHeight="283.5" d:DesignWidth="640"
+             Style="{DynamicResource OptionsPageStyle}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ResourceDictionary.xaml" />
+                <ResourceDictionary Source="../Resources/UtilsResourceDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock FontWeight="DemiBold"
+                   Text="{Binding ErrorMessage, Mode=OneWay}"
+                   Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}"
+                   Grid.Row="0" />
+
+        <GroupBox Header="{x:Static const:LocalizedStrings.GeneralSettings}"
+                  IsTabStop="False"
+                  Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="10" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{x:Static const:LocalizedStrings.DefaultOutputDirectory}"
+                           AutomationProperties.Name="{x:Static const:LocalizedStrings.DefaultOutputDirectory}"
+                           Grid.Column="0" Grid.Row="0" />
+                <TextBlock Text="{Binding OutputDirectory}"
+                           AutomationProperties.HelpText="{Binding OutputDirectory}"
+                           Grid.Column="2" Grid.Row="0" />
+                <Button Content="..."
+                        Name="UpdateDirectoryButton"
+                        Click="UpdateDirectoryClick"
+                        AutomationProperties.Name="{x:Static const:LocalizedStrings.SelectDefaultOutputDirectory}"
+                        KeyboardNavigation.TabIndex="0"
+                        Grid.Column="4" Grid.Row="0" />
+                <TextBlock Text="{x:Static const:LocalizedStrings.DefaultReportFilename}"
+                           Grid.Column="0" Grid.Row="2" />
+                <TextBox Text="{Binding DefaultOutputName, Mode=TwoWay}"
+                         AutomationProperties.Name="{x:Static const:LocalizedStrings.DefaultReportFilename}"
+                         KeyboardNavigation.TabIndex="1"
+                         Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" />
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="{x:Static const:LocalizedStrings.OutputFormats}"
+                  IsTabStop="False"
+                  Grid.Row="2">
+            <DockPanel>
+                <TextBlock Visibility="{Binding UpdatingPlatforms, Converter={StaticResource BoolToVisibility}}"
+                           Text="{x:Static const:LocalizedStrings.RefreshingOutputFormats}"
+                           AutomationProperties.Name="{x:Static const:LocalizedStrings.RefreshingOutputFormats}"
+                           KeyboardNavigation.IsTabStop="false" 
+                           KeyboardNavigation.TabIndex="0" Margin="0,5"/>
+                <ItemsControl ItemsSource="{Binding Path=Formats, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Visibility="{Binding Path=UpdatingPlatforms, Mode=OneWay, Converter={StaticResource HideWhenTrue}}"
+                              KeyboardNavigation.IsTabStop="False">
+
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="Control.Margin" Value="5,5,0,0" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Content="{Binding DisplayName}"
+                                      KeyboardNavigation.IsTabStop="True"
+                                      KeyboardNavigation.TabIndex="1"
+                                      AutomationProperties.Name="{Binding DisplayName}"
+                                      Padding="3,0,10,3" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DockPanel>
+        </GroupBox>
+
+        <GroupBox Header="{x:Static const:LocalizedStrings.TargetPlatforms}"
+                  IsTabStop="False"
+                  Grid.Row="3">
+            <DockPanel>
+                <TextBlock Visibility="{Binding UpdatingPlatforms, Converter={StaticResource BoolToVisibility}}"
+                           Text="{x:Static const:LocalizedStrings.RefreshingPlatforms}"
+                           KeyboardNavigation.IsTabStop="false"
+                           KeyboardNavigation.TabIndex="0"
+                           Margin="0,5,0,5"/>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              KeyboardNavigation.IsTabStop="False"
+                              IsTabStop="False">
+                    <ItemsControl ItemsSource="{Binding Path=Targets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Visibility="{Binding Path=UpdatingPlatforms, Mode=OneWay, Converter={StaticResource HideWhenTrue}}"
+                                  Background="Transparent" BorderBrush="Transparent"
+                                  KeyboardNavigation.IsTabStop="False">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="Control.Margin" Value="5,5,0,0" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel LastChildFill="True">
+                                    <TextBlock Text="{Binding Converter={StaticResource TargetPlatformDisplayName}}"
+                                               DockPanel.Dock="Top" />
+                                    <ItemsControl ItemsSource="{Binding Path=Versions}"
+                                                  Margin="10,5,0,0"
+                                                  KeyboardNavigation.DirectionalNavigation="Local"
+                                                  KeyboardNavigation.IsTabStop="False">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                          Content="{Binding Version}"
+                                                          KeyboardNavigation.IsTabStop="True"
+                                                          KeyboardNavigation.TabIndex="1"
+                                                          AutomationProperties.Name="{Binding Converter={StaticResource TargetInformationString}}"
+                                                          Padding="3,0,10,3" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </GroupBox>
+
+        <Grid Margin="0,10,10,5" MinHeight="10" HorizontalAlignment="Stretch"
+              KeyboardNavigation.IsTabStop="False"
+              Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                        Content="{x:Static const:LocalizedStrings.Refresh}"
+                        Click="RefreshRequested"
+                        AutomationProperties.Name="{x:Static const:LocalizedStrings.Refresh}"
+                        KeyboardNavigation.TabIndex="1"
+                        Grid.Column="0" Grid.Row="0" />
+
+
+
+            <TextBlock AutomationProperties.LabeledBy="{Binding ElementName=AboutToolLabel}"
+                       Grid.Column="2"
+                       HorizontalAlignment="Right">
+                <Hyperlink NavigateUri="DocumentationLinks.About" RequestNavigate="NavigateToMoreInformation"
+                           AutomationProperties.Name="{x:Static const:LocalizedStrings.AboutTool}">
+                    <TextBlock Name="AboutToolLabel"
+                               Text="{x:Static const:LocalizedStrings.AboutTool}"
+                               KeyboardNavigation.IsTabStop="True"
+                               KeyboardNavigation.TabIndex="0"/>
+                </Hyperlink>
+            </TextBlock>
+
+
+
+            <TextBlock AutomationProperties.LabeledBy="{Binding ElementName=AboutPrivacyLabel}" 
+                       Grid.Column="4"
+                       HorizontalAlignment="Right">
+                <Hyperlink NavigateUri="DocumentationLinks.PrivacyPolicy" RequestNavigate="NavigateToPrivacyModel"
+                           AutomationProperties.Name="{x:Static const:LocalizedStrings.AboutPrivacy}">
+                    <TextBlock Name="AboutPrivacyLabel"
+                               Text="{x:Static const:LocalizedStrings.AboutPrivacy}"
+                               KeyboardNavigation.IsTabStop="True"
+                               KeyboardNavigation.TabIndex="0"/>
+                </Hyperlink>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</UserControl>

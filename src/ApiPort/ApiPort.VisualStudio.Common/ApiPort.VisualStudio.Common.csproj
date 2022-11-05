@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>ApiPortVS</RootNamespace>
+    <DefineConstants>$(DefineConstants);DEV15</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,22 +26,6 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Remove="Resources\LocalizedStrings.resx" />
-    <EmbeddedResource Include="Resources\LocalizedStrings.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>LocalizedStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Resources\LocalizedStrings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LocalizedStrings.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
   <!-- See https://github.com/NuGet/Home/issues/2365 for more info. 
        The decision whether an assembly needs to be linked or referenced belongs to the package author.
        
@@ -53,4 +38,5 @@
       </ReferencePath>
     </ItemGroup>
   </Target>
+  <Import Project="..\ApiPort.VisualStudio.Common.Shared\ApiPort.VisualStudio.Common.Shared.projitems" Label="Shared" />
 </Project>

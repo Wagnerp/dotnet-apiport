@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.Fx.Portability.ObjectModel;
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,23 +33,20 @@ namespace Microsoft.Fx.Portability.Reports.DGML
                 }
 
                 // create nodes for all the references, if non platform.
-                if (userAsem.AssemblyReferences != null)
+                foreach (var reference in userAsem.AssemblyReferences)
                 {
-                    foreach (var reference in userAsem.AssemblyReferences)
+                    if (!(assembliesWithData.ContainsKey(reference.ToString()) || unresolvedAssemblies.Contains(reference.ToString())))
                     {
-                        if (!(assembliesWithData.ContainsKey(reference.ToString()) || unresolvedAssemblies.Contains(reference.ToString())))
-                        {
-                            // platform reference (not in the user specified asssemblies and not an unresolved assembly.
-                            continue;
-                        }
-
-                        var refNode = rg.GetOrAddNodeForAssembly(new ReferenceNode(reference.ToString()));
-
-                        // if the reference is missing, flag it as such.
-                        refNode.IsMissing = unresolvedAssemblies.Contains(reference.ToString());
-
-                        node.AddReferenceToNode(refNode);
+                        // platform reference (not in the user specified asssemblies and not an unresolved assembly.
+                        continue;
                     }
+
+                    var refNode = rg.GetOrAddNodeForAssembly(new ReferenceNode(reference.ToString()));
+
+                    // if the reference is missing, flag it as such.
+                    refNode.IsMissing = unresolvedAssemblies.Contains(reference.ToString());
+
+                    node.AddReferenceToNode(refNode);
                 }
             }
 

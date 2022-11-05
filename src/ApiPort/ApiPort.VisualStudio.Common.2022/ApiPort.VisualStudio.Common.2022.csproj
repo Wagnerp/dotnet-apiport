@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>ApiPortVS</RootNamespace>
+    <DefineConstants>$(DefineConstants);DEV17</DefineConstants>
+    
+    <!-- In order to ensure XAML static references stay compatible, we need to use the same assembly name across versions -->
+    <AssemblyName>ApiPort.VisualStudio.Common</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib\Microsoft.Fx.Portability.Cci\Microsoft.Fx.Portability.Cci.csproj" />
+    <ProjectReference Include="..\..\lib\Microsoft.Fx.Portability\Microsoft.Fx.Portability.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="16.5.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Sdk" Version="17.0.31902.203" />
+    <PackageReference Include="NuGet.VisualStudio" Version="4.4.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- See https://github.com/NuGet/Home/issues/2365 for more info. 
+       The decision whether an assembly needs to be linked or referenced belongs to the package author.
+       
+       The NuGet package Microsoft.VisualStudio.SDK.EmbedInteropTypes was failing to update the reference so
+       instead we will manually update it here -->
+  <Target Name="LinkNuGetVisualStudioEmbeddableAssemblies" AfterTargets="ResolveReferences" BeforeTargets="FindReferenceAssembliesForReferences">
+    <ItemGroup>
+      <ReferencePath Condition=" '%(FileName)' == 'NuGet.VisualStudio' ">
+        <EmbedInteropTypes>true</EmbedInteropTypes>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
+  <Import Project="..\ApiPort.VisualStudio.Common.Shared\ApiPort.VisualStudio.Common.Shared.projitems" Label="Shared" />
+</Project>
